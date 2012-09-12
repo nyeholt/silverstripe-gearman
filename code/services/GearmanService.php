@@ -15,6 +15,7 @@ class GearmanService {
 		$val = get_include_path();
 		require_once 'Net/Gearman/Client.php';
 		
+		// @TODO Make this an injected, configured property....
 		$client = new Net_Gearman_Client('localhost:4730');
 		$set = new Net_Gearman_Set;
 		
