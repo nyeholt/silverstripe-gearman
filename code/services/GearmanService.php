@@ -10,15 +10,20 @@
  */
 class GearmanService {
 	
+	public $host = 'localhost';
+	public $port = '4730';
+	
+	public $name = null;
+	
 	public function __call($method, $args) {
-		$name = preg_replace("/[^\w_]/","",Director::baseFolder() .'_handle');
+		$name = $this->name ? $this->name : preg_replace("/[^\w_]/","",Director::baseFolder() .'_handle');
 		$val = get_include_path();
 		require_once 'Net/Gearman/Client.php';
 		
 		// @TODO Make this an injected, configured property....
-		$client = new Net_Gearman_Client('localhost:4730');
+		$client = new Net_Gearman_Client($this->host . ':' . $this->port);
 		$set = new Net_Gearman_Set;
-		
+
 		array_unshift($args, $method);
 		$task = new Net_Gearman_Task($name, $args, null, Net_Gearman_Task::JOB_BACKGROUND);
 		$set->addTask($task);

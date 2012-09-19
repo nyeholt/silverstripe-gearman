@@ -81,6 +81,7 @@ DataModel::set_inst(new DataModel());
 $injector = Injector::inst();
 
 $name = preg_replace("/[^\w_]/","",Director::baseFolder() .'_handle');
+
 require_once 'Net/Gearman/Client.php';
 $client = new Net_Gearman_Client('localhost:4730');
 $set = new Net_Gearman_Set;
