@@ -9,6 +9,14 @@ Adds a basic level of support for the gearmand php job queue
   it's a bit of a nightmare getting the pecl extension sorted out with 
   all dependencies atm!
 
+To test the installation is correct, there's a test job you can execute
+
+* Open two terminal windows in the SS root directory
+* In the first, run php gearman/gearman_runner.php
+* In the second, run php gearman/gearman_test_client.php
+* You should see some information output to the first console window,
+  indicating the job was picked up and processed as expected. 
+
 ## Usage
 
 * Define a class that implements GearmanHandler

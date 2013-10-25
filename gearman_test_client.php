@@ -1,13 +1,6 @@
 <?php
 
-/**
- * File similar to main.php designed for command-line scripts
- * 
- * This file lets you execute SilverStripe requests from the command-line.  The URL is passed as the first argument to the scripts.
- * 
- * @package framework
- * @subpackage core
- */
+// A test client to ensure your gearman server is running properly
 
 /**
  * Ensure that people can't access this from a web-server
@@ -85,11 +78,11 @@ $name = preg_replace("/[^\w_]/","",Director::baseFolder() .'_handle');
 require_once 'Net/Gearman/Client.php';
 $client = new Net_Gearman_Client('localhost:4730');
 $set = new Net_Gearman_Set;
-$args = array('first', '2nd', uniqid());
+$args = array('GearmanTest', '2nd', uniqid());
 $task = new Net_Gearman_Task($name, $args, null, Net_Gearman_Task::JOB_BACKGROUND);
+
 $set->addTask($task);
 $client->runSet($set);
 
 echo "Done\n";
-
 

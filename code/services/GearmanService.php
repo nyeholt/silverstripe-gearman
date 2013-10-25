@@ -1,6 +1,4 @@
 <?php
-
-
 /**
  *
  * Used to interface with the gearman service
