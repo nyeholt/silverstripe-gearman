@@ -82,23 +82,24 @@ DataModel::set_inst(new DataModel());
 
 $name = preg_replace("/[^\w_]/","",Director::baseFolder() .'_handle');
 
-require_once 'Net/Gearman/Worker.php';
-
-function gearman_handle($args) {
-	Injector::inst()->GearmanService->handleCall($args);
-}
-
-$classDef = <<<CLS
-class Net_Gearman_Job_$name extends Net_Gearman_Job_Common {
-	public function run(\$args) {
-		gearman_handle(\$args);
+$function = function ($args) {
+	echo date('[Y-m-d H:i:s]') . " - running gearman job with args: $args...";
+	
+	$args = @unserialize($args);
+	$injector = Injector::inst();
+	try {
+		$svc = $injector->get('GearmanService');
+		$svc->handleCall($args);
+	} catch (Exception $ex) {
+		echo "Could not run task: " . $ex->getMessage();
+		print_r($ex->getTrace());
 	}
-}
-CLS;
-eval($classDef);
+	
+	echo "Job complete, memory used " . memory_get_usage() . "\n";
+	return;
+};
 
-$worker = new Net_Gearman_Worker('localhost:4730');
-$worker->addAbility($name);
-$worker->beginWork();
-
-
+$worker = new \Net\Gearman\Worker();
+$worker->addServer();
+$worker->addFunction('gearman_handle', $function);
+$worker->work();
