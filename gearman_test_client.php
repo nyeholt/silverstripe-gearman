@@ -73,16 +73,8 @@ DataModel::set_inst(new DataModel());
 
 $injector = Injector::inst();
 
-$name = preg_replace("/[^\w_]/","",Director::baseFolder() .'_handle');
 
-require_once 'Net/Gearman/Client.php';
-$client = new Net_Gearman_Client('localhost:4730');
-$set = new Net_Gearman_Set;
-$args = array('GearmanTest', '2nd', uniqid());
-$task = new Net_Gearman_Task($name, $args, null, Net_Gearman_Task::JOB_BACKGROUND);
+$client = new \Net\Gearman\Client();
+$client->addServer();
 
-$set->addTask($task);
-$client->runSet($set);
-
-echo "Done\n";
-
+$client->doBackground('gearman_handle', serialize(array('GearmanTest', 'other param')));

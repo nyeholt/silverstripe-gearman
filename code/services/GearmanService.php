@@ -8,33 +8,52 @@
  */
 class GearmanService {
 	
+	const HANDLER_NAME = 'gearman_handle';
+	
 	public $host = 'localhost';
 	public $port = '4730';
 	
 	public $name = null;
 	
 	public function __call($method, $args) {
-		$name = $this->name ? $this->name : preg_replace("/[^\w_]/","",Director::baseFolder() .'_handle');
-		$val = get_include_path();
-		require_once 'Net/Gearman/Client.php';
-		
-		// @TODO Make this an injected, configured property....
-		$client = new Net_Gearman_Client($this->host . ':' . $this->port);
-		$set = new Net_Gearman_Set;
-
+		$client = new \Net\Gearman\Client();
+		$client->addServer($this->host, $this->port);
 		array_unshift($args, $method);
-		$task = new Net_Gearman_Task($name, $args, null, Net_Gearman_Task::JOB_BACKGROUND);
-		$set->addTask($task);
-		$client->runSet($set);
+		$client->doBackground(self::HANDLER_NAME, serialize($args));
 	}
 	
+	/**
+	 * Send a job, with a particular type
+	 * 
+	 * @param string $type
+	 *				one of background|scheduled
+	 * @param string $method
+	 *				the name of the job, must have a worker defined for it in a GearmanHandler somewhere
+	 * @param array $args
+	 *				the method arguments
+	 */
+	public function sendJob($type, $method, $args = array(), $timestamp = 0) {
+		$client = new \Net\Gearman\Client();
+		$client->addServer($this->host, $this->port);
+		array_unshift($args, $method);
+		
+		switch ($type) {
+			case 'scheduled': {
+				$client->doEpoch(self::HANDLER_NAME, serialize($args), $timestamp);
+				break;
+			};
+			default: {
+				$client->doBackground(self::HANDLER_NAME, serialize($args));
+			}
+		}
+	}
+
 	public function handleCall($args) {
 		if (!count($args)) {
 			return;
 		}
 		$workerImpl = ClassInfo::implementorsOf('GearmanHandler');
-		$workers = array();
-		
+
 		$method = array_shift($args);
 		
 		foreach ($workerImpl as $type) {

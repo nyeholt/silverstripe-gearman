@@ -12,5 +12,6 @@
 	],
 	"require":
 	{
+		"publero/net_gearman": "1.0.*@dev"
 	}
 }
