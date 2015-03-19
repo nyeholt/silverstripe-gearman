@@ -1,5 +1,5 @@
 {
-	"name": "silverstripe/gearman",
+	"name": "silverstripe-australia/gearman",
 	"description": "A simple integration with the gearmand job processor",
 	"type": "silverstripe-module",
 	"keywords": ["silverstripe", "gearman", "queuedjobs", "jobs"],
@@ -12,7 +12,5 @@
 	],
 	"require":
 	{
-		"silverstripe/framework": "3.1.x-dev",
-                "silverstripe/cms": "3.1.x-dev"
 	}
 }
