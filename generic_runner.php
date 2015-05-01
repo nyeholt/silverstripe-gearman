@@ -1,6 +1,7 @@
+#!/usr/bin/php
 <?php
 
-// A test client to ensure your gearman server is running properly
+include_once dirname(__DIR__).'/vendor/autoload.php';
 
 /**
  * Ensure that people can't access this from a web-server
@@ -14,7 +15,6 @@ if(isset($_SERVER['HTTP_HOST'])) {
  * Identify the cli-script.php file and change to its container directory, so that require_once() works
  */
 $_SERVER['SCRIPT_FILENAME'] = __FILE__;
-chdir(dirname(dirname($_SERVER['SCRIPT_FILENAME'])) . '/framework');
 
 /**
  * Process arguments and load them into the $_GET and $_REQUEST arrays
@@ -50,30 +50,35 @@ if(isset($_SERVER['argv'][1])) {
 	$_GET['url'] = $_SERVER['argv'][1];
 }
 
-/**
- * Include SilverStripe's core code
- */
-require_once("core/Core.php");
+$function = function ($args) {
+	echo date('[Y-m-d H:i:s]') . " - running gearman job with args: $args...";
+	
+	$raw = @unserialize($args);
+	
+	if (isset($raw[0])) {
+		$path = $raw[0];
+		$based = base64_encode($args);
+		
+		$cmd = $path . '/framework/cli-script.php';
+		echo "Executing against $cmd\n";
+		if (file_exists($cmd)) {
+			
+			$cmd = "php $cmd dev/tasks/GearmanJobTask gearman_data=" . escapeshellarg($based);
+			
+			echo "Doing $cmd\n";
+			
+			$output = `$cmd`;
 
-global $databaseConfig;
+			echo $output . "\n";
+			echo "Job complete, memory used " . memory_get_usage() . "\n";
+			return;
+		}
+	}
 
-// We don't have a session in cli-script, but this prevents errors
-$_SESSION = null;
+	echo "Invalid job discarded\n";
+};
 
-// Connect to database
-require_once("model/DB.php");
-DB::connect($databaseConfig);
-
-// Get the request URL from the querystring arguments
-
-$_SERVER['REQUEST_URI'] = BASE_URL;
-
-// Direct away - this is the "main" function, that hands control to the apporopriate controller
-DataModel::set_inst(new DataModel());
-
-$injector = Injector::inst();
-
-$client = new \Net\Gearman\Client();
-$client->addServer();
-
-$client->doBackground('silverstripe_handler', serialize(array(Director::baseFolder(), 'GearmanTest', 'other param')));
+$worker = new \Net\Gearman\Worker();
+$worker->addServer();
+$worker->addFunction('silverstripe_handler', $function);
+$worker->work();
