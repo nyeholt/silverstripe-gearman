@@ -8,7 +8,7 @@
  */
 class GearmanService {
 	
-	const HANDLER_NAME = 'gearman_handle';
+	const HANDLER_NAME = 'silverstripe_handler';
 	
 	public $host = 'localhost';
 	public $port = '4730';
@@ -18,6 +18,8 @@ class GearmanService {
 	public function __call($method, $args) {
 		$client = new \Net\Gearman\Client();
 		$client->addServer($this->host, $this->port);
+
+		array_unshift($args, Director::baseFolder());
 		array_unshift($args, $method);
 		$client->doBackground(self::HANDLER_NAME, serialize($args));
 	}
@@ -35,6 +37,7 @@ class GearmanService {
 	public function sendJob($type, $method, $args = array(), $timestamp = 0) {
 		$client = new \Net\Gearman\Client();
 		$client->addServer($this->host, $this->port);
+		array_unshift($args, Director::baseFolder());
 		array_unshift($args, $method);
 		
 		switch ($type) {
@@ -54,7 +57,9 @@ class GearmanService {
 		}
 		$workerImpl = ClassInfo::implementorsOf('GearmanHandler');
 
+		
 		$method = array_shift($args);
+		$path = array_shift($args);
 		
 		foreach ($workerImpl as $type) {
 			$obj = Injector::inst()->get($type);

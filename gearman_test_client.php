@@ -77,4 +77,4 @@ $injector = Injector::inst();
 $client = new \Net\Gearman\Client();
 $client->addServer();
 
-$client->doBackground('gearman_handle', serialize(array('GearmanTest', 'other param')));
+$client->doBackground('silverstripe_handler', serialize(array('GearmanTest', Director::baseFolder(), 'other param')));

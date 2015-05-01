@@ -2,15 +2,6 @@
 <?php
 
 /**
- * File similar to main.php designed for command-line scripts
- * 
- * This file lets you execute SilverStripe requests from the command-line.  The URL is passed as the first argument to the scripts.
- * 
- * @package framework
- * @subpackage core
- */
-
-/**
  * Ensure that people can't access this from a web-server
  */
 if(isset($_SERVER['HTTP_HOST'])) {
@@ -101,5 +92,5 @@ $function = function ($args) {
 
 $worker = new \Net\Gearman\Worker();
 $worker->addServer();
-$worker->addFunction('gearman_handle', $function);
+$worker->addFunction('silverstripe_handler', $function);
 $worker->work();
