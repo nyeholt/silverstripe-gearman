@@ -59,7 +59,6 @@ class GearmanService {
 		}
 		$workerImpl = ClassInfo::implementorsOf('GearmanHandler');
 
-		
 		$path = array_shift($args);
 		$method = array_shift($args);
 		
