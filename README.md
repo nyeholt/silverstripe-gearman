@@ -25,8 +25,21 @@ To test the installation is correct, there's a test job you can execute
 * Define a class that implements GearmanHandler
 * The 'getName' method should return the name of a method on the class that
   will handle the processing of the job (exampleMethod)
-* Start the listener by calling php gearman/gearman\_runner.php
+* Start a worker by calling php gearman/gearman\_runner.php
 * Trigger the job by calling `$this->gearmanService->exampleMethod();`
 * Any params passed through to exampleMethod are passed on to the worker
 * Note: This only supports 'background' jobs at the moment, so there are NO
   return values
+
+## Reflected worker
+
+The 'gearman\_runner' script is bound to a single instance of SilverStripe; 
+this means that any job spawned against the gearman server is handled and 
+executed by that instance of SilverStripe. In situations where you have 
+multiple instances of SS running, you will need to use the 
+`reflected_runner.php` script instead of gearman\_runner.php. This handler will
+include the path of the SS instance that triggered the gearman job to be 
+executed, and will spawn a separate process to  execute that gearman job within
+
+ 
+
