@@ -19,8 +19,9 @@ class GearmanService {
 		$client = new \Net\Gearman\Client();
 		$client->addServer($this->host, $this->port);
 
-		array_unshift($args, Director::baseFolder());
 		array_unshift($args, $method);
+		array_unshift($args, Director::baseFolder());
+		
 		$client->doBackground(self::HANDLER_NAME, serialize($args));
 	}
 	
@@ -37,8 +38,9 @@ class GearmanService {
 	public function sendJob($type, $method, $args = array(), $timestamp = 0) {
 		$client = new \Net\Gearman\Client();
 		$client->addServer($this->host, $this->port);
-		array_unshift($args, Director::baseFolder());
+		
 		array_unshift($args, $method);
+		array_unshift($args, Director::baseFolder());
 		
 		switch ($type) {
 			case 'scheduled': {
@@ -58,8 +60,8 @@ class GearmanService {
 		$workerImpl = ClassInfo::implementorsOf('GearmanHandler');
 
 		
-		$method = array_shift($args);
 		$path = array_shift($args);
+		$method = array_shift($args);
 		
 		foreach ($workerImpl as $type) {
 			$obj = Injector::inst()->get($type);
