@@ -7,6 +7,9 @@
  */
 class GearmanJobTask extends BuildTask {
 	public function run($request) {
+		if (PHP_SAPI != 'cli') {
+			throw new Exception("Please only run this task from the command line");
+		}
 		$data = $request->getVar('gearman_data');
 		
 		if (!strlen($data)) {
