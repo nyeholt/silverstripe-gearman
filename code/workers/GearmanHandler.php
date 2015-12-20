@@ -5,6 +5,7 @@
  * 
  * @author marcus
  */
-interface GearmanHandler {
-	public function getName();
+interface GearmanHandler
+{
+    public function getName();
 }
